@@ -82,6 +82,15 @@ contract ERC20 is IERC20 {
      */
     function transfer(address to, uint256 amount) public virtual override returns (bool) {
     
+            require(to != address(0), "Input address cannot be the zero address.");
+            require(msg.sender.balance >= amount, "Sender does not have enough balance.");
+
+
+            _balances[msg.sender] -= amount;
+            _balances[to] += amount;
+            emit Transfer(msg.sender, to, amount);
+            return true;
+
          /* <------ Your code goes here ------->
          */
        
@@ -107,6 +116,11 @@ contract ERC20 is IERC20 {
     function approve(address spender, uint256 amount) public virtual override returns (bool) {
          /* <------ Your code goes here ------->
          */
+
+        require(spender != address(0), "Input address cannot be the zero address.");
+        _allowances[msg.sender][spender] = amount;
+        emit Approval(msg.sender, spender, amount);
+        return true;
     }
 
     /**
@@ -128,6 +142,17 @@ contract ERC20 is IERC20 {
     function transferFrom(address from, address to, uint256 amount) public virtual override returns (bool) {
           /* <------ Your code goes here ------->
          */
+
+        require(from != address(0) ,"transfer from zero address ");
+        require( to != address(0),"transfer to  zero address");
+        require(_balances[from] >= amount , "transferFrom amount exceeds balance ");
+        require( _allowances[from][msg.sender] >= amount, "transferFrom amount exceeds  allowance");
+        
+        _balances[from] -= amount;
+        _allowances[from][msg.sender] -= amount;
+        _balances[to] += amount;
+        emit Transfer(from, to, amount);
+        return true;
     }
 
     /**
@@ -191,6 +216,14 @@ contract ERC20 is IERC20 {
        
          /* <------ Your code goes here ------->
          */
+        require(from != address(0) ,"transfer from zero address ");
+        require( to != address(0),"transfer to  zero address");
+        require(from.balance >= amount, "Insufficient balance.");
+
+        _balances[msg.sender] -= amount;
+        _balances[to] += amount;
+
+        emit Transfer(from, to, amount);
     }
 
     /** @dev Creates `amount` tokens and assigns them to `account`, increasing
